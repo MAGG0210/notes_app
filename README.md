@@ -1,17 +1,73 @@
-# notes_app
+# 云笔记 (notes_app)
 
-A new Flutter project.
+一个基于 **Flutter + Supabase** 的跨端云笔记应用：邮箱登录、云端备份、多端实时同步。
 
-## Getting Started
+- 🖥️ 支持平台：Android / Web / Windows
+- ☁️ 后端：Supabase（PostgreSQL + Auth + Realtime + RLS 行级安全）
+- 🔒 数据隔离：每个用户只能读写自己的笔记（行级安全策略）
 
-This project is a starting point for a Flutter application.
+## 功能特性
 
-A few resources to get you started if this is your first Flutter project:
+- 邮箱 + 密码注册 / 登录（Supabase Auth）
+- 笔记的增、删、改、查，云端存储
+- **Realtime 实时同步**：任何一端增删改笔记，其他端自动刷新（带防抖合并）
+- 下拉刷新 / 手动刷新
+- 相对时间显示（刚刚 / N 分钟前 / N 小时前 / 日期）
+- 登录态全局监听，登出即时生效
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## 技术栈
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+| 层 | 技术 |
+|---|---|
+| 客户端 | Flutter (Dart SDK ^3.12.2), Material 3 |
+| 后端 | Supabase (PostgreSQL, Auth, Realtime) |
+| 依赖 | supabase_flutter ^2.8.4, intl |
+
+## 项目结构
+
+```
+lib/
+├── main.dart            应用入口 + 登录态路由（StreamBuilder 监听 Auth 状态）
+├── config.dart          Supabase URL / anon key 配置
+├── note_service.dart    服务层：认证、笔记 CRUD、Realtime 订阅封装
+├── auth_page.dart       登录 / 注册页
+├── notes_page.dart      笔记列表页（Realtime 实时刷新）
+└── note_edit_page.dart  新建 / 编辑 / 删除笔记页
+supabase_schema.sql      Supabase 建表 + RLS 策略 + Realtime + 触发器 SQL
+```
+
+## 快速开始
+
+### 1. 搭建 Supabase 后端
+
+1. 在 [Supabase](https://supabase.com) 创建项目。
+2. 打开 **SQL Editor**，执行根目录的 [`supabase_schema.sql`](supabase_schema.sql)（建表、索引、RLS 策略、Realtime、`updated_at` 触发器）。
+3. 在 **Authentication → Providers** 确认 Email 登录已开启。
+
+### 2. 配置客户端
+
+修改 `lib/config.dart`：
+
+```dart
+class SupabaseConfig {
+  static const String url = 'https://你的项目.supabase.co';      // Project URL
+  static const String anonKey = '你的anon/public key';           // Project API Keys → anon
+}
+```
+
+### 3. 运行
+
+```bash
+flutter pub get
+flutter run          # 选择目标设备（Android / Web / Windows）
+```
+
+## 安全说明
+
+- 客户端仅使用 Supabase **anon（public）key**，配合数据库 **RLS（行级安全）** 实现数据隔离。
+- **切勿**在客户端或仓库中提交 `service_role`（secret）key——该 key 拥有绕过 RLS 的权限。
+- 若修改了 `notes` 表结构，请同步更新 RLS 策略，确保所有操作仍受 `auth.uid() = user_id` 约束。
+
+## License
+
+MIT
