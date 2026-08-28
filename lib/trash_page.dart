@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'note_service.dart';
+import 'app_theme.dart';
 
 /// 回收站：展示已软删除的笔记，支持恢复 / 永久删除
 class TrashPage extends StatefulWidget {
@@ -137,10 +138,23 @@ class _TrashPageState extends State<TrashPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.delete_outline, size: 64, color: Colors.grey.shade400),
-            const SizedBox(height: 12),
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                gradient: AppColors.gradientSoft,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.delete_outline,
+                  size: 44, color: AppColors.primary),
+            ),
+            const SizedBox(height: 16),
             Text('回收站是空的',
-                style: TextStyle(color: Colors.grey.shade600)),
+                style: TextStyle(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.6))),
           ],
         ),
       );

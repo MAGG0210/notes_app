@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'note_service.dart';
+import 'app_theme.dart';
 
 /// 账户管理：查看邮箱、修改密码
 class AccountPage extends StatefulWidget {
@@ -98,15 +99,14 @@ class _AccountPageState extends State<AccountPage> {
           if (_success != null)
             Text(_success!, style: TextStyle(color: Colors.green.shade600)),
           const SizedBox(height: 16),
-          FilledButton(
-            onPressed: _loading ? null : _changePassword,
-            style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16)),
-            child: _loading
-                ? const SizedBox(
-                    width: 20, height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2))
-                : const Text('确认修改'),
+          GradientButton(
+            loading: _loading,
+            onPressed: _changePassword,
+            child: const Text('确认修改',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white)),
           ),
         ],
       ),

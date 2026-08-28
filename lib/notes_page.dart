@@ -8,6 +8,7 @@ import 'note_edit_page.dart';
 import 'trash_page.dart';
 import 'account_page.dart';
 import 'theme_store.dart';
+import 'app_theme.dart';
 
 /// 笔记列表页：Realtime 订阅任何端的变化，实时刷新。
 class NotesPage extends StatefulWidget {
@@ -216,7 +217,25 @@ class _NotesPageState extends State<NotesPage> {
           );
           if (changed == true) _load();
         },
-        child: const Icon(Icons.add),
+        // 渐变背景 FAB
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            gradient: AppColors.gradient,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.4),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: const Icon(Icons.add, color: Colors.white, size: 28),
+        ),
       ),
       body: Column(
         children: [
@@ -303,13 +322,26 @@ class _NotesPageState extends State<NotesPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.notes, size: 64, color: Colors.grey.shade400),
-            const SizedBox(height: 12),
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                gradient: AppColors.gradientSoft,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.notes,
+                  size: 44, color: AppColors.primary),
+            ),
+            const SizedBox(height: 16),
             Text(
               _notes.isEmpty
                   ? '还没有笔记，点右下角 + 新建'
                   : '没有匹配的笔记',
-              style: TextStyle(color: Colors.grey.shade600),
+              style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.6)),
             ),
           ],
         ),
@@ -354,19 +386,21 @@ class _NotesPageState extends State<NotesPage> {
                   children: tags
                       .map((t) => Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 1),
+                                horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
                               color: Theme.of(context)
                                   .colorScheme
-                                  .secondaryContainer,
+                                  .primary
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text('#$t',
                                 style: TextStyle(
                                     fontSize: 11,
+                                    fontWeight: FontWeight.w500,
                                     color: Theme.of(context)
                                         .colorScheme
-                                        .onSecondaryContainer)),
+                                        .primary)),
                           ))
                       .toList(),
                 ),

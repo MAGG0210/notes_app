@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'note_service.dart';
+import 'app_theme.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -88,79 +89,127 @@ class _AuthPageState extends State<AuthPage> {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Icon(Icons.sticky_note_2_rounded, size: 64,
-                    color: Color(0xFF5B8DEF)),
-                const SizedBox(height: 12),
-                Text(_isLogin ? '登录云笔记' : '注册账号',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineMedium),
-                const SizedBox(height: 8),
-                Text('三端互通 · 云备份',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey.shade600)),
-                const SizedBox(height: 32),
-                TextField(
-                  controller: _emailCtrl,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: '邮箱',
-                    prefixIcon: Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _passCtrl,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: '密码',
-                    prefixIcon: Icon(Icons.lock_outline),
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                if (_isLogin)
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: _loading ? null : _forgotPassword,
-                      child: const Text('忘记密码？'),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: dark
+              ? const LinearGradient(
+                  colors: [Color(0xFF1B1E3A), Color(0xFF12141B)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                )
+              : AppColors.gradientSoft,
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(28, 32, 28, 24),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: dark ? 0.3 : 0.08),
+                      blurRadius: 40,
+                      offset: const Offset(0, 16),
                     ),
-                  ),
-                if (_error != null) ...[
-                  const SizedBox(height: 12),
-                  Text(_error!, style: TextStyle(color: Colors.red.shade400)),
-                ],
-                const SizedBox(height: 24),
-                FilledButton(
-                  onPressed: _loading ? null : _submit,
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: _loading
-                      ? const SizedBox(
-                          width: 20, height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2))
-                      : Text(_isLogin ? '登 录' : '注 册'),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                TextButton(
-                  onPressed: () => setState(() {
-                    _isLogin = !_isLogin;
-                    _error = null;
-                  }),
-                  child: Text(_isLogin ? '没有账号？去注册' : '已有账号？去登录'),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // 品牌图标（渐变块）
+                    Center(
+                      child: Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          gradient: AppColors.gradient,
+                          borderRadius: BorderRadius.circular(22),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.35),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(Icons.sticky_note_2_rounded,
+                            color: Colors.white, size: 36),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(_isLogin ? '登录云笔记' : '注册账号',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headlineMedium),
+                    const SizedBox(height: 6),
+                    Text('三端互通 · 云备份 · 精致书写',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.6))),
+                    const SizedBox(height: 28),
+                    TextField(
+                      controller: _emailCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: '邮箱',
+                        prefixIcon: Icon(Icons.email_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: _passCtrl,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        labelText: '密码',
+                        prefixIcon: Icon(Icons.lock_outline),
+                      ),
+                    ),
+                    if (_isLogin)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: _loading ? null : _forgotPassword,
+                          child: const Text('忘记密码？'),
+                        ),
+                      ),
+                    if (_error != null) ...[
+                      const SizedBox(height: 8),
+                      Text(_error!,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.red.shade400, fontSize: 13)),
+                    ],
+                    const SizedBox(height: 16),
+                    GradientButton(
+                      loading: _loading,
+                      onPressed: _submit,
+                      child: Text(
+                          _isLogin ? '登 录' : '注 册',
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white)),
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () => setState(() {
+                        _isLogin = !_isLogin;
+                        _error = null;
+                      }),
+                      child: Text(_isLogin ? '没有账号？去注册' : '已有账号？去登录'),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

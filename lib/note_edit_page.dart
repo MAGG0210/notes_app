@@ -146,88 +146,104 @@ class _NoteEditPageState extends State<NoteEditPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // 置顶开关
-          SwitchListTile(
-            dense: true,
-            secondary: Icon(
-              Icons.push_pin_outlined,
-              color: _pinned ? Colors.orange.shade600 : null,
-            ),
-            title: const Text('置顶笔记'),
-            value: _pinned,
-            onChanged: _saving
-                ? null
-                : (v) => setState(() => _pinned = v),
-          ),
-          const Divider(height: 1),
-          // 标签输入区
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 4,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                ..._tags.map((t) => InputChip(
-                      label: Text('#$t'),
-                      visualDensity: VisualDensity.compact,
-                      onDeleted: _saving ? null : () => _removeTag(t),
-                    )),
-                SizedBox(
-                  width: 160,
-                  child: TextField(
-                    controller: _tagCtrl,
-                    enabled: !_saving,
-                    decoration: const InputDecoration(
-                      hintText: '添加标签后回车',
-                      isDense: true,
-                      border: InputBorder.none,
-                    ),
-                    onSubmitted: _addTag,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 16),
-          // 正文区
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            // 元信息卡片：置顶 + 标签
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Column(
                 children: [
-                  TextField(
-                    controller: _titleCtrl,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.w600),
-                    decoration: const InputDecoration(
-                      hintText: '标题',
-                      border: InputBorder.none,
+                  SwitchListTile(
+                    dense: true,
+                    secondary: Icon(
+                      Icons.push_pin_outlined,
+                      color: _pinned ? Colors.orange.shade600 : null,
                     ),
+                    title: const Text('置顶笔记'),
+                    value: _pinned,
+                    onChanged: _saving
+                        ? null
+                        : (v) => setState(() => _pinned = v),
                   ),
-                  Expanded(
-                    child: _previewMode
-                        ? SingleChildScrollView(
-                            child: MarkdownBody(data: _contentCtrl.text),
-                          )
-                        : TextField(
-                            controller: _contentCtrl,
-                            maxLines: null,
-                            expands: true,
-                            textAlignVertical: TextAlignVertical.top,
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  // 标签输入区
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        ..._tags.map((t) => InputChip(
+                              label: Text('#$t'),
+                              visualDensity: VisualDensity.compact,
+                              onDeleted:
+                                  _saving ? null : () => _removeTag(t),
+                            )),
+                        SizedBox(
+                          width: 160,
+                          child: TextField(
+                            controller: _tagCtrl,
+                            enabled: !_saving,
                             decoration: const InputDecoration(
-                              hintText: '支持 Markdown 语法…',
+                              hintText: '添加标签后回车',
+                              isDense: true,
                               border: InputBorder.none,
                             ),
+                            onSubmitted: _addTag,
                           ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(height: 4),
                 ],
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            // 正文区
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _titleCtrl,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w600),
+                      decoration: const InputDecoration(
+                        hintText: '标题',
+                        border: InputBorder.none,
+                      ),
+                    ),
+                    Expanded(
+                      child: _previewMode
+                          ? SingleChildScrollView(
+                              child: MarkdownBody(data: _contentCtrl.text),
+                            )
+                          : TextField(
+                              controller: _contentCtrl,
+                              maxLines: null,
+                              expands: true,
+                              textAlignVertical: TextAlignVertical.top,
+                              decoration: const InputDecoration(
+                                hintText: '支持 Markdown 语法…',
+                                border: InputBorder.none,
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
