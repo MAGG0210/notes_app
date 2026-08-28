@@ -32,14 +32,36 @@ class NoteService {
     await _client.auth.signOut();
   }
 
+  // ---------- 账户 ----------
+  /// 修改密码（需已登录）
+  Future<void> updatePassword(String newPassword) async {
+    await _client.auth.updateUser(UserAttributes(password: newPassword));
+  }
+
+  /// 发送重置密码邮件（忘记密码流程）
+  Future<void> resetPassword(String email) async {
+    await _client.auth.resetPasswordForEmail(email);
+  }
+
   // ---------- 笔记 CRUD ----------
-  /// 拉取笔记，置顶优先，再按更新时间倒序。
+  /// 拉取正常笔记（排除回收站），置顶优先，再按更新时间倒序。
   Future<List<Map<String, dynamic>>> fetchNotes() async {
     final res = await _client
         .from('notes')
         .select()
+        .isFilter('deleted_at', null)
         .order('pinned', ascending: false)
         .order('updated_at', ascending: false);
+    return List<Map<String, dynamic>>.from(res);
+  }
+
+  /// 拉取回收站里的笔记（已软删除），按删除时间倒序。
+  Future<List<Map<String, dynamic>>> fetchTrash() async {
+    final res = await _client
+        .from('notes')
+        .select()
+        .not('deleted_at', 'is', null)
+        .order('deleted_at', ascending: false);
     return List<Map<String, dynamic>>.from(res);
   }
 
@@ -75,7 +97,20 @@ class NoteService {
     }).eq('id', id);
   }
 
+  /// 软删除：笔记移入回收站（不物理删除）
   Future<void> deleteNote(String id) async {
+    await _client.from('notes').update({
+      'deleted_at': DateTime.now().toUtc().toIso8601String(),
+    }).eq('id', id);
+  }
+
+  /// 恢复：从回收站还原笔记
+  Future<void> restoreNote(String id) async {
+    await _client.from('notes').update({'deleted_at': null}).eq('id', id);
+  }
+
+  /// 永久删除：从回收站彻底清除
+  Future<void> purgeNote(String id) async {
     await _client.from('notes').delete().eq('id', id);
   }
 

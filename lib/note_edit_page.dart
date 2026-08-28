@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'note_service.dart';
 
 /// 新建 / 编辑笔记页面
@@ -16,6 +17,7 @@ class _NoteEditPageState extends State<NoteEditPage> {
   late final TextEditingController _tagCtrl;
   late List<String> _tags;
   late bool _pinned;
+  bool _previewMode = false;
   bool _saving = false;
 
   @override
@@ -88,7 +90,7 @@ class _NoteEditPageState extends State<NoteEditPage> {
       context: context,
       builder: (c) => AlertDialog(
         title: const Text('删除笔记？'),
-        content: const Text('删除后云端也会同步移除，无法恢复。'),
+        content: const Text('将移入回收站，可在回收站恢复。'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(c, false),
               child: const Text('取消')),
@@ -125,6 +127,15 @@ class _NoteEditPageState extends State<NoteEditPage> {
               tooltip: '删除',
               onPressed: _saving ? null : _delete,
             ),
+          IconButton(
+            icon: Icon(_previewMode
+                ? Icons.edit_outlined
+                : Icons.visibility_outlined),
+            tooltip: _previewMode ? '编辑模式' : 'Markdown 预览',
+            onPressed: _saving ? null : () => setState(() {
+                  _previewMode = !_previewMode;
+                }),
+          ),
           IconButton(
             icon: _saving
                 ? const SizedBox(width: 18, height: 18,
@@ -197,16 +208,20 @@ class _NoteEditPageState extends State<NoteEditPage> {
                     ),
                   ),
                   Expanded(
-                    child: TextField(
-                      controller: _contentCtrl,
-                      maxLines: null,
-                      expands: true,
-                      textAlignVertical: TextAlignVertical.top,
-                      decoration: const InputDecoration(
-                        hintText: '开始书写…',
-                        border: InputBorder.none,
-                      ),
-                    ),
+                    child: _previewMode
+                        ? SingleChildScrollView(
+                            child: MarkdownBody(data: _contentCtrl.text),
+                          )
+                        : TextField(
+                            controller: _contentCtrl,
+                            maxLines: null,
+                            expands: true,
+                            textAlignVertical: TextAlignVertical.top,
+                            decoration: const InputDecoration(
+                              hintText: '支持 Markdown 语法…',
+                              border: InputBorder.none,
+                            ),
+                          ),
                   ),
                 ],
               ),

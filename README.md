@@ -14,6 +14,9 @@
 - **搜索**：按标题 / 内容实时搜索过滤
 - **标签系统**：笔记可添加多个标签，按标签筛选
 - **置顶笔记**：重要笔记置顶显示
+- **Markdown 支持**：编辑时实时预览 Markdown 渲染效果
+- **回收站**：删除进回收站，可恢复或永久清除
+- **账户管理**：修改密码、忘记密码（邮件重置）
 - **暗色 / 亮色模式**：跟随系统或手动切换，本地持久化
 - **复制 / 导出**：一键复制笔记、分享导出纯文本
 - 下拉刷新 / 手动刷新
@@ -26,7 +29,7 @@
 |---|---|
 | 客户端 | Flutter (Dart SDK ^3.12.2), Material 3 |
 | 后端 | Supabase (PostgreSQL, Auth, Realtime) |
-| 依赖 | supabase_flutter ^2.8.4, intl, shared_preferences, share_plus |
+| 依赖 | supabase_flutter ^2.8.4, intl, shared_preferences, share_plus, flutter_markdown |
 
 ## 项目结构
 
@@ -34,11 +37,13 @@
 lib/
 ├── main.dart            应用入口 + 登录态路由（StreamBuilder 监听 Auth 状态）
 ├── config.dart          Supabase URL / anon key 配置
-├── note_service.dart    服务层：认证、笔记 CRUD、Realtime 订阅封装
+├── note_service.dart    服务层：认证、笔记 CRUD、回收站、Realtime 订阅封装
 ├── theme_store.dart     主题模式存储（亮色 / 暗色 / 跟随系统）
-├── auth_page.dart       登录 / 注册页
+├── auth_page.dart       登录 / 注册页（含忘记密码）
 ├── notes_page.dart      笔记列表页（搜索 / 标签筛选 / Realtime 实时刷新）
-└── note_edit_page.dart  新建 / 编辑 / 删除笔记页（标签 / 置顶）
+├── note_edit_page.dart  新建 / 编辑 / 删除笔记页（标签 / 置顶 / Markdown 预览）
+├── trash_page.dart      回收站（恢复 / 永久删除）
+└── account_page.dart    账户管理（修改密码）
 supabase_schema.sql      Supabase 建表 + RLS 策略 + Realtime + 触发器 SQL
 ```
 

@@ -5,6 +5,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'note_service.dart';
 import 'note_edit_page.dart';
+import 'trash_page.dart';
+import 'account_page.dart';
 import 'theme_store.dart';
 
 /// 笔记列表页：Realtime 订阅任何端的变化，实时刷新。
@@ -78,6 +80,33 @@ class _NotesPageState extends State<NotesPage> {
 
   Future<void> _signOut() async {
     await NoteService.instance.signOut();
+  }
+
+  Future<void> _openTrash() async {
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(builder: (_) => const TrashPage()),
+    );
+    // 从回收站返回后刷新（可能恢复了笔记）
+    _load();
+  }
+
+  Future<void> _openAccount() async {
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(builder: (_) => const AccountPage()),
+    );
+  }
+
+  /// 将 Markdown 内容简化为纯文本摘要
+  String _stripMarkdown(String s) {
+    return s
+        .replaceAll(RegExp(r'!\[.*?\]\(.*?\)'), '')
+        .replaceAll(RegExp(r'\[(.*?)\]\(.*?\)'), r'$1')
+        .replaceAll(RegExp(r'#{1,6}\s*'), '')
+        .replaceAll(RegExp(r'^\s*[-*+]\s+', multiLine: true), '')
+        .replaceAll(RegExp(r'[*_~`>]'), '')
+        .trim();
   }
 
   // ---------- 搜索 / 筛选 ----------
@@ -160,14 +189,19 @@ class _NotesPageState extends State<NotesPage> {
           PopupMenuButton<String>(
             onSelected: (v) {
               if (v == 'logout') _signOut();
+              if (v == 'trash') _openTrash();
+              if (v == 'account') _openAccount();
               if (v == 'theme_light') ThemeStore.set(ThemeMode.light);
               if (v == 'theme_dark') ThemeStore.set(ThemeMode.dark);
               if (v == 'theme_system') ThemeStore.set(ThemeMode.system);
             },
             itemBuilder: (_) => const [
+              PopupMenuItem(value: 'account', child: Text('账户')),
               PopupMenuItem(value: 'theme_light', child: Text('外观：亮色')),
               PopupMenuItem(value: 'theme_dark', child: Text('外观：暗色')),
               PopupMenuItem(value: 'theme_system', child: Text('外观：跟随系统')),
+              PopupMenuDivider(),
+              PopupMenuItem(value: 'trash', child: Text('回收站')),
               PopupMenuDivider(),
               PopupMenuItem(value: 'logout', child: Text('退出登录')),
             ],
@@ -310,7 +344,8 @@ class _NotesPageState extends State<NotesPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (content.isNotEmpty)
-              Text(content, maxLines: 1, overflow: TextOverflow.ellipsis),
+              Text(_stripMarkdown(content),
+                  maxLines: 1, overflow: TextOverflow.ellipsis),
             if (tags.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 2),

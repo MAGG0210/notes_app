@@ -52,6 +52,40 @@ class _AuthPageState extends State<AuthPage> {
     }
   }
 
+  Future<void> _forgotPassword() async {
+    final email = _emailCtrl.text.trim();
+    if (email.isEmpty) {
+      setState(() => _error = '请先输入邮箱');
+      return;
+    }
+    setState(() { _loading = true; _error = null; });
+    try {
+      await NoteService.instance.resetPassword(email);
+      if (mounted) {
+        setState(() => _loading = false);
+        await showDialog<void>(
+          context: context,
+          builder: (c) => AlertDialog(
+            title: const Text('重置密码邮件已发送'),
+            content: const Text('请前往邮箱查收重置邮件，按邮件提示完成密码重置。'),
+            actions: [
+              FilledButton(
+                  onPressed: () => Navigator.pop(c),
+                  child: const Text('知道了')),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _error = '发送失败: $e';
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,6 +128,14 @@ class _AuthPageState extends State<AuthPage> {
                     border: OutlineInputBorder(),
                   ),
                 ),
+                if (_isLogin)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: _loading ? null : _forgotPassword,
+                      child: const Text('忘记密码？'),
+                    ),
+                  ),
                 if (_error != null) ...[
                   const SizedBox(height: 12),
                   Text(_error!, style: TextStyle(color: Colors.red.shade400)),
