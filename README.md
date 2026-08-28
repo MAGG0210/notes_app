@@ -11,6 +11,11 @@
 - 邮箱 + 密码注册 / 登录（Supabase Auth）
 - 笔记的增、删、改、查，云端存储
 - **Realtime 实时同步**：任何一端增删改笔记，其他端自动刷新（带防抖合并）
+- **搜索**：按标题 / 内容实时搜索过滤
+- **标签系统**：笔记可添加多个标签，按标签筛选
+- **置顶笔记**：重要笔记置顶显示
+- **暗色 / 亮色模式**：跟随系统或手动切换，本地持久化
+- **复制 / 导出**：一键复制笔记、分享导出纯文本
 - 下拉刷新 / 手动刷新
 - 相对时间显示（刚刚 / N 分钟前 / N 小时前 / 日期）
 - 登录态全局监听，登出即时生效
@@ -21,7 +26,7 @@
 |---|---|
 | 客户端 | Flutter (Dart SDK ^3.12.2), Material 3 |
 | 后端 | Supabase (PostgreSQL, Auth, Realtime) |
-| 依赖 | supabase_flutter ^2.8.4, intl |
+| 依赖 | supabase_flutter ^2.8.4, intl, shared_preferences, share_plus |
 
 ## 项目结构
 
@@ -30,9 +35,10 @@ lib/
 ├── main.dart            应用入口 + 登录态路由（StreamBuilder 监听 Auth 状态）
 ├── config.dart          Supabase URL / anon key 配置
 ├── note_service.dart    服务层：认证、笔记 CRUD、Realtime 订阅封装
+├── theme_store.dart     主题模式存储（亮色 / 暗色 / 跟随系统）
 ├── auth_page.dart       登录 / 注册页
-├── notes_page.dart      笔记列表页（Realtime 实时刷新）
-└── note_edit_page.dart  新建 / 编辑 / 删除笔记页
+├── notes_page.dart      笔记列表页（搜索 / 标签筛选 / Realtime 实时刷新）
+└── note_edit_page.dart  新建 / 编辑 / 删除笔记页（标签 / 置顶）
 supabase_schema.sql      Supabase 建表 + RLS 策略 + Realtime + 触发器 SQL
 ```
 

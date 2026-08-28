@@ -3,10 +3,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'note_service.dart';
 import 'auth_page.dart';
 import 'notes_page.dart';
+import 'theme_store.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NoteService.init();
+  await ThemeStore.load();
   runApp(const NotesApp());
 }
 
@@ -15,14 +17,25 @@ class NotesApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: '云笔记',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF5B8DEF)),
-        useMaterial3: true,
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeStore.notifier,
+      builder: (context, mode, _) => MaterialApp(
+        title: '云笔记',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF5B8DEF)),
+          useMaterial3: true,
+        ),
+        darkTheme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF5B8DEF),
+            brightness: Brightness.dark,
+          ),
+          useMaterial3: true,
+        ),
+        themeMode: mode,
+        home: const RootPage(),
       ),
-      home: const RootPage(),
     );
   }
 }

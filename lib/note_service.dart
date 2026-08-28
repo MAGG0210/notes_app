@@ -33,19 +33,28 @@ class NoteService {
   }
 
   // ---------- 笔记 CRUD ----------
+  /// 拉取笔记，置顶优先，再按更新时间倒序。
   Future<List<Map<String, dynamic>>> fetchNotes() async {
     final res = await _client
         .from('notes')
         .select()
+        .order('pinned', ascending: false)
         .order('updated_at', ascending: false);
     return List<Map<String, dynamic>>.from(res);
   }
 
-  Future<Map<String, dynamic>> createNote({required String title, required String content}) async {
+  Future<Map<String, dynamic>> createNote({
+    required String title,
+    required String content,
+    List<String> tags = const [],
+    bool pinned = false,
+  }) async {
     final res = await _client.from('notes').insert({
       'user_id': userId,
       'title': title,
       'content': content,
+      'tags': tags,
+      'pinned': pinned,
     }).select().single();
     return Map<String, dynamic>.from(res);
   }
@@ -54,11 +63,15 @@ class NoteService {
     required String id,
     required String title,
     required String content,
+    List<String> tags = const [],
+    bool pinned = false,
   }) async {
+    // updated_at 由数据库触发器自动更新，客户端不手动传
     await _client.from('notes').update({
       'title': title,
       'content': content,
-      'updated_at': DateTime.now().toUtc().toIso8601String(),
+      'tags': tags,
+      'pinned': pinned,
     }).eq('id', id);
   }
 
